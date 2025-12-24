@@ -1,112 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>GT7 Master Tuning Lab v6.0</title>
-    <style>
-        :root { --gt-red: #e4000f; --bg: #0b0b0b; --panel: #1a1a1a; --text: #ececec; }
-        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding: 20px; }
-        .wrapper { max-width: 1200px; margin: auto; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
-        .panel { background: var(--panel); padding: 20px; border-radius: 8px; border: 1px solid #333; height: fit-content; }
-        h3 { color: #fff; text-transform: uppercase; font-size: 14px; border-left: 4px solid var(--gt-red); padding-left: 10px; margin-bottom: 20px; }
-        .input-row { display: flex; gap: 10px; margin-bottom: 10px; }
-        label { display: block; font-size: 11px; color: #aaa; margin-bottom: 5px; text-transform: uppercase; }
-        select, input { width: 100%; padding: 10px; background: #262626; border: 1px solid #444; color: #fff; border-radius: 4px; box-sizing: border-box; }
-        table { width: 100%; border-collapse: collapse; }
-        td { padding: 10px 0; border-bottom: 1px solid #262626; }
-        .val { color: #00ffcc; font-weight: bold; text-align: right; font-family: monospace; font-size: 16px; }
-        .btn-calc { background: var(--gt-red); color: white; border: none; padding: 18px; width: 100%; font-weight: bold; cursor: pointer; border-radius: 4px; margin-top: 10px; font-size: 16px; }
-    </style>
-</head>
-<body>
-
-<div class="wrapper">
-    <div class="panel" style="margin-bottom:20px; border-top: 5px solid var(--gt-red);">
-        <h3>Vehicle Physics & Setup</h3>
-        <div class="grid">
-            <div class="input-group">
-                <label>Vehicle Base</label>
-                <select id="carSelect">
-                    <option value="gtr_gr3">Nissan GT-R GT3 '13 (FR)</option>
-                    <option value="porsche_rsr">Porsche 911 RSR '17 (MR/RR)</option>
-                    <option value="corolla_gr">Toyota GR Corolla '22 (4WD)</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label>Tire Compound</label>
-                <select id="tireSelect">
-                    <option value="0.7">Comfort: Hard (CH)</option>
-                    <option value="1.0">Racing: Hard (RH)</option>
-                    <option value="1.2">Racing: Soft (RS)</option>
-                </select>
-            </div>
-        </div>
-        
-        <div class="input-row" style="margin-top:15px;">
-            <div class="input-group"><label>HP</label><input type="number" id="inHP" value="550"></div>
-            <div class="input-group"><label>Weight (kg)</label><input type="number" id="inKG" value="1300"></div>
-            <div class="input-group"><label>Target PP</label><input type="number" id="inPP" value="700"></div>
-        </div>
-        <button class="btn-calc" onclick="calculateMasterTune()">GENERATE COMPLETE SETUP</button>
-    </div>
-
-    <div id="results" style="display:none;" class="grid">
-        <div class="panel">
-            <h3>Suspension (F/R)</h3>
-            <table>
-                <tr><td>Ride Height</td><td class="val" id="v-h">--</td></tr>
-                <tr><td>Natural Frequency</td><td class="val" id="v-f">--</td></tr>
-                <tr><td>Negative Camber</td><td class="val" id="v-cam">--</td></tr>
-                <tr><td>Brake Balance</td><td class="val" id="v-brake-bal">--</td></tr>
-            </table>
-        </div>
-
-        <div class="panel">
-            <h3>Aero, LSD & Power</h3>
-            <table>
-                <tr><td>Downforce (kgf)</td><td class="val" id="v-aero">--</td></tr>
-                <tr><td>LSD Accel Sens.</td><td class="val" id="v-acc">--</td></tr>
-                <tr><td>Power Restrictor</td><td class="val" id="v-restrict">--</td></tr>
-            </table>
-        </div>
-    </div>
-</div>
-
-<script>
-const carPresets = {
-    gtr_gr3: { drive: "FR", h: 55, f: 3.5, aero: [200, 500] },
-    porsche_rsr: { drive: "MR", h: 50, f: 3.3, aero: [300, 700] },
-    corolla_gr: { drive: "4WD", h: 90, f: 2.2, aero: [50, 200] }
-};
-
-function calculateMasterTune() {
-    const car = carPresets[document.getElementById('carSelect').value];
-    const tireGrip = parseFloat(document.getElementById('tireSelect').value);
-    const hp = parseInt(document.getElementById('inHP').value);
-    const kg = parseInt(document.getElementById('inKG').value);
-
-    // 1. DYNAMIC BRAKE BALANCE
-    // FR cars benefit from rear bias to help rotation; MR cars need front bias to prevent spinning.
-    let brakeBal = (car.drive === "FR") ? "+2 (Rear)" : "-2 (Front)";
-    document.getElementById('v-brake-bal').innerText = brakeBal;
-
-    // 2. TIRE-DRIVEN PHYSICS
-    let nf = (car.f * tireGrip).toFixed(2);
-    let camber = (tireGrip > 1.0) ? "3.5 / 3.0" : "2.0 / 1.5";
-    
-    // 3. PP BALANCING (If Racing Softs are used, cut power more)
-    let restrict = (tireGrip > 1.1) ? 85 : 100;
-
-    document.getElementById('v-h').innerText = `${car.h} / ${car.h + 5}`;
-    document.getElementById('v-f').innerText = `${nf} / ${(nf * 1.05).toFixed(2)}`;
-    document.getElementById('v-cam').innerText = camber;
-    document.getElementById('v-aero').innerText = `${car.aero[0]} / ${car.aero[1]}`;
-    document.getElementById('v-acc').innerText = (car.drive === "MR") ? 25 : 45;
-    document.getElementById('v-restrict').innerText = restrict + "%";
-
-    document.getElementById('results').style.display = 'grid';
-}
-</script>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="GT7 Master Tuning Lab - Professional Gran Turismo 7 vehicle setup calculator"
+    />
+    <title>GT7 Master Tuning Lab</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
 </html>
