@@ -2,145 +2,166 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GT7 Master Tuning Lab v4.5</title>
+    <title>GT7 Master Tuning Lab v4.0</title>
     <style>
         :root { --gt-red: #e4000f; --gt-blue: #003cff; --bg: #0b0b0b; --panel: #1a1a1a; }
-        
-        body { 
-            background: var(--bg); 
-            color: #ececec; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            margin: 0; 
-            padding: 15px; 
-            font-size: 16px; /* Larger base font for mobile readability */
-        }
-
-        /* Responsive Container */
-        .container { max-width: 1000px; margin: auto; }
-
-        /* Grid System: 3 columns on Desktop, 1 column on Mobile */
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
-            gap: 15px; 
-        }
-
-        .panel { 
-            background: var(--panel); 
-            padding: 20px; 
-            border-radius: 8px; 
-            border: 1px solid #333; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-
-        /* Mobile-Specific Overrides */
-        @media (max-width: 768px) {
-            body { padding: 10px; }
-            h1 { font-size: 22px; }
-            
-            /* Make inputs much larger for thumbs */
-            select, input { 
-                font-size: 18px !important; 
-                padding: 12px !important; 
-            }
-
-            .btn-calc {
-                padding: 20px !important;
-                font-size: 18px !important;
-                position: sticky; /* Keep the button visible while scrolling */
-                bottom: 10px;
-                z-index: 100;
-                box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
-            }
-
-            /* Tables are hard on mobile - increase spacing */
-            td { padding: 12px 0 !important; font-size: 15px; }
-            .val { font-size: 18px !important; }
-        }
-
-        h3 { color: #fff; text-transform: uppercase; font-size: 14px; margin: 0 0 15px 0; border-left: 4px solid var(--gt-red); padding-left: 10px; }
-        label { display: block; font-size: 12px; color: #aaa; margin-bottom: 6px; text-transform: uppercase; }
-        select, input { width: 100%; padding: 10px; background: #262626; border: 1px solid #444; color: #fff; margin-bottom: 15px; border-radius: 6px; box-sizing: border-box; }
+        body { background: var(--bg); color: #ececec; font-family: 'Inter', sans-serif; margin: 0; padding: 20px; font-size: 14px; }
+        .container { max-width: 1100px; margin: auto; }
+        .header { border-bottom: 2px solid var(--gt-red); padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; }
+        .panel { background: var(--panel); padding: 15px; border-radius: 4px; border: 1px solid #333; }
+        h3 { color: #fff; text-transform: uppercase; font-size: 13px; margin: 0 0 10px 0; border-left: 3px solid var(--gt-red); padding-left: 8px; }
+        label { display: block; font-size: 11px; color: #aaa; margin-bottom: 4px; }
+        select, input { width: 100%; padding: 8px; background: #262626; border: 1px solid #444; color: #fff; margin-bottom: 12px; }
         table { width: 100%; border-collapse: collapse; }
-        td { padding: 8px 0; border-bottom: 1px solid #262626; }
-        .val { color: #00ffcc; font-weight: bold; text-align: right; font-family: 'Courier New', monospace; }
-        .btn-calc { background: var(--gt-red); color: white; border: none; padding: 15px; width: 100%; font-weight: bold; cursor: pointer; border-radius: 6px; }
+        td { padding: 6px 0; border-bottom: 1px solid #262626; }
+        .val { color: #00ffcc; font-weight: bold; text-align: right; font-family: monospace; font-size: 15px; }
+        .btn-calc { background: var(--gt-red); color: white; border: none; padding: 15px; width: 100%; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .highlight { color: #e4000f; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <header style="margin-bottom:20px;">
-        <h1 style="margin:0; font-style: italic; color: #fff;">GT7 TUNING LAB <small style="font-size: 12px; color: var(--gt-red);">MOBILE-READY</small></h1>
-    </header>
+    <div class="header">
+        <div><h1 style="margin:0; font-style: italic;">GT7 TUNING LAB <small>v4.0</small></h1><span>Tire-Aware Physics Engine</span></div>
+        <div style="text-align:right">Regulation: <select id="ppGoal" style="width:100px; margin:0;"><option value="max">Unlimited</option><option value="800">800 PP</option><option value="700">700 PP</option></select></div>
+    </div>
 
-    <div class="panel" style="margin-bottom:20px;">
-        <div class="grid">
-            <div class="input-group">
-                <label>Car Select</label>
+    <div class="panel" style="margin-bottom:15px;">
+        <div class="grid" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
+            <div>
+                <label>Car Selection</label>
                 <select id="carSelect">
-                    <option value="porsche_rsr">Porsche 911 RSR '17 (Gr.3)</option>
-                    <option value="ferrari_458">Ferrari 458 GT3 '13 (Gr.3)</option>
-                    <option value="corolla_gr">Toyota GR Corolla '22</option>
+                    <option value="ferrari_458_gr3">Ferrari 458 GT3 '13 (MR)</option>
+                    <option value="gtr_gr3">Nissan GT-R GT3 '13 (FR)</option>
+                    <option value="corolla_gr">Toyota GR Corolla '22 (4WD)</option>
                 </select>
             </div>
-            <div class="input-group">
-                <label>Tires</label>
+            <div>
+                <label>Tire Compound</label>
                 <select id="tireSelect">
+                    <option value="0.7">Comfort Hard (CH)</option>
+                    <option value="0.9">Sport Medium (SM)</option>
                     <option value="1.0">Racing Hard (RH)</option>
-                    <option value="1.1">Racing Medium (RM)</option>
                     <option value="1.2">Racing Soft (RS)</option>
                 </select>
             </div>
-            <div class="input-group">
-                <label>Target PP</label>
-                <select id="ppGoal">
-                    <option value="800">800 PP</option>
-                    <option value="700">700 PP</option>
-                    <option value="max">No Limit</option>
+            <div>
+                <label>Track Geometry</label>
+                <select id="trackSelect">
+                    <option value="flat">Standard (Spa, Suzuka)</option>
+                    <option value="bumpy">Bumpy (Nordschleife, Sebring)</option>
+                </select>
+            </div>
+            <div>
+                <label>Tune Fixer</label>
+                <select id="fix">
+                    <option value="neutral">Neutral Balance</option>
+                    <option value="under">Fix Understeer</option>
+                    <option value="over">Fix Oversteer</option>
                 </select>
             </div>
         </div>
-        <button class="btn-calc" onclick="calculate()">GENERATE TUNING SHEET</button>
+        <button class="btn-calc" onclick="calculateMasterTune()">Apply Physics Scaling</button>
     </div>
 
-    <div id="results" style="display:none;" class="grid">
-        <div class="panel">
-            <h3>Suspension</h3>
-            <table>
-                <tr><td>Ride Height</td><td class="val" id="r-h">--</td></tr>
-                <tr><td>Nat. Frequency</td><td class="val" id="r-f">--</td></tr>
-                <tr><td>Anti-Roll Bar</td><td class="val" id="r-a">--</td></tr>
-                <tr><td>Negative Camber</td><td class="val" id="r-c">--</td></tr>
-            </table>
-        </div>
-        <div class="panel">
-            <h3>Gearing & LSD</h3>
-            <table>
-                <tr><td>Auto Top Speed</td><td class="val" id="r-g">--</td></tr>
-                <tr><td>Accel. Sens.</td><td class="val" id="r-acc">--</td></tr>
-                <tr><td>Brake Sens.</td><td class="val" id="r-brk">--</td></tr>
-            </table>
+    <div id="results" style="display:none;">
+        <div class="grid">
+            <div class="panel">
+                <h3>Suspension & Camber</h3>
+                <table>
+                    <tr><td>Ride Height</td><td class="val" id="v-height">--</td></tr>
+                    <tr><td>Natural Frequency</td><td class="val" id="v-freq">--</td></tr>
+                    <tr><td>Anti-Roll Bar</td><td class="val" id="v-arb">--</td></tr>
+                    <tr><td>Negative Camber</td><td class="val" id="v-camber">--</td></tr>
+                    <tr><td>Toe (Front/Rear)</td><td class="val" id="v-toe">--</td></tr>
+                </table>
+            </div>
+
+            <div class="panel">
+                <h3>LSD & Gearing</h3>
+                <table>
+                    <tr><td>Initial Torque</td><td class="val" id="v-init">--</td></tr>
+                    <tr><td>Acceleration Sens.</td><td class="val" id="v-accel">--</td></tr>
+                    <tr><td>Braking Sens.</td><td class="val" id="v-brake">--</td></tr>
+                    <tr><td>Top Speed (Auto)</td><td class="val" id="v-gear">--</td></tr>
+                </table>
+            </div>
+
+            <div class="panel">
+                <h3>PP & Tire Impact</h3>
+                <table>
+                    <tr><td>Est. Grip Multiplier</td><td class="val" id="v-grip">--</td></tr>
+                    <tr><td>Ballast Weight</td><td class="val" id="v-ballast">--</td></tr>
+                    <tr><td>Power Restrictor</td><td class="val" id="v-restrict">--</td></tr>
+                </table>
+                <p style="font-size:11px; color:#888; margin-top:10px;">
+                    Racing tires increase PP dramatically. To stay within regulation, we use <b>Forward Ballast</b> to optimize the center of gravity while cutting power.
+                </p>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    // Minimal Logic for Prototype
-    function calculate() {
-        // (Insert previous logic modules here)
-        document.getElementById('r-h').innerText = "55 / 60";
-        document.getElementById('r-f').innerText = "3.50 / 3.80";
-        document.getElementById('r-a').innerText = "6 / 5";
-        document.getElementById('r-c').innerText = "3.0 / 2.5";
-        document.getElementById('r-g').innerText = "300 km/h";
-        document.getElementById('r-acc').innerText = "35";
-        document.getElementById('r-brk').innerText = "45";
-        
-        document.getElementById('results').style.display = 'grid';
-    }
-</script>
+const db = {
+    ferrari_458_gr3: { drive: "MR", h: 60, f: 3.5, c: 2.5, gear: 310, acc: 30, brk: 45 },
+    gtr_gr3: { drive: "FR", h: 55, f: 3.8, c: 3.0, gear: 320, acc: 35, brk: 25 },
+    corolla_gr: { drive: "4WD", h: 100, f: 2.2, c: 1.5, gear: 260, acc: 45, brk: 15 }
+};
 
+function calculateMasterTune() {
+    const car = db[document.getElementById('carSelect').value];
+    const grip = parseFloat(document.getElementById('tireSelect').value);
+    const track = document.getElementById('trackSelect').value;
+    const pp = document.getElementById('ppGoal').value;
+    const fix = document.getElementById('fix').value;
+
+    // 1. FREQUENCY & CAMBER SCALING (Based on Tire Grip)
+    // Racing Softs (1.2) allow much higher spring rates (NF).
+    let fFreq = car.f * grip;
+    let rFreq = (car.f * 1.1) * grip;
+    let fCam = car.c * grip;
+    let rCam = (car.c * 0.8) * grip;
+
+    // 2. RIDE HEIGHT ADJUSTMENT
+    let fH = car.h, rH = car.h + 5;
+    if (track === 'bumpy') { fH += 15; rH += 15; fFreq *= 0.85; rFreq *= 0.85; }
+
+    // 3. LSD ADJUSTMENT (Grip allows more locking)
+    let accel = Math.min(60, car.acc * grip);
+    let brake = car.brk; // Braking sensitivity is more about weight bias than tire grip
+
+    // 4. FIX LOGIC
+    let fArb = 6, rArb = 5;
+    if (fix === 'under') { fArb -= 2; fCam += 0.5; fH -= 4; }
+    if (fix === 'over') { rArb -= 2; rCam += 0.5; rH += 4; }
+
+    // 5. PP BALANCE (Tire Penalty)
+    let ballast = 0, restrict = 100;
+    if (pp !== 'max') {
+        let tirePenalty = (grip > 1.0) ? 100 : 0; // Soft tires cost more PP
+        ballast = (pp === '700') ? (50 + tirePenalty) : 20;
+        restrict = (pp === '700') ? (90 - (tirePenalty/10)) : 100;
+    }
+
+    // OUTPUT
+    document.getElementById('v-height').innerText = `${fH} / ${rH}`;
+    document.getElementById('v-freq').innerText = `${fFreq.toFixed(2)} / ${rFreq.toFixed(2)}`;
+    document.getElementById('v-arb').innerText = `${fArb} / ${rArb}`;
+    document.getElementById('v-camber').innerText = `${fCam.toFixed(1)} / ${rCam.toFixed(1)}`;
+    document.getElementById('v-toe').innerText = "0.10 Out / 0.20 In";
+    document.getElementById('v-init').innerText = (car.drive === "MR") ? 15 : 10;
+    document.getElementById('v-accel').innerText = Math.round(accel);
+    document.getElementById('v-brake').innerText = brake;
+    document.getElementById('v-gear').innerText = car.gear + " km/h";
+    document.getElementById('v-grip').innerText = `x${grip}`;
+    document.getElementById('v-ballast').innerText = ballast + " kg";
+    document.getElementById('v-restrict').innerText = restrict + "%";
+
+    document.getElementById('results').style.display = 'block';
+}
+</script>
 </body>
 </html>
