@@ -2,7 +2,7 @@
   "name": "gt7-tuning-lab",
   "version": "5.0.0",
   "private": true,
-  "homepage": "https://prodspec-ux.github.io/gt7-tune-lab",
+  "homepage": "https://prodspec-ux.github.io/GT7-Tune-Lab",
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
